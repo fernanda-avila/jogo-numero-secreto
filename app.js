@@ -1,43 +1,66 @@
-alert('Boas vindas ao jogo do número secreto!');
-let numeroMaximo = 100;
-let numeroSecreto = parseInt(Math.random() * numeroMaximo + 1);
-// math random gera numeros aleatorios de 0 a 1, x10 pra que tenha uma casa antes da virgula e parseint para pegar so a parte inteira do numero randomizado.
-console.log(numeroSecreto);
-let chute;
-// Se o chute for igual ao numero secreto, o comando é executado
+let listaDeNumerosSorteados = [];
+let numeroLimite = 10;
+let numeroSecreto = gerarNumeroAleatorio();
 let tentativas = 1;
-// while significa enquanto e indica que o comando vai se repetir até que o resultado correto seja alcançado
 
-while (chute != numeroSecreto) {
-    chute = prompt(`Escolha um número entre 1 e ${numeroMaximo}`);
-    // não é igual no js "!="
-    if (chute == numeroSecreto) {
-        break;
-        // para PARA para tudo mesmo, pra que o while nao funcione se você acertar de primeira.
-        alert(`Isso aí! Você descobriu o numero secreto ${numeroSecreto} com ${tentativas} tentativas`);
-        // Usar crase!!
-        // a variavel vai dentro de ${}
-
-    }
-    // se não for igual...o else diz, SE NÃO
-    else {
-        if (chute > numeroSecreto) {
-            alert(`O número secreto é menor que ${chute}`)
-        } else {
-            alert(`O número secreto é maior que ${chute}`)
-        }
-        // tentativas = tentativas + 1; ou
-        tentativas++;
-    }
-
-
+function exibirTextoNaTela(tag, texto) {
+    let campo = document.querySelector(tag);
+    campo.innerHTML = texto;
+    responsiveVoice.speak(texto, 'Brazilian Portuguese Female', {rate:1.2});
 }
 
-let palavraTentativa = tentativas > 1 ? 'tentativas' : 'tentativa';
-alert(`Isso aí! Você descobriu o numero secreto ${numeroSecreto} com ${tentativas} ${palavraTentativa}`);
-// simplificado. operador ternário!!
+function exibirMensagemInicial() {
+    exibirTextoNaTela('h1', 'Jogo do número secreto');
+    exibirTextoNaTela('p', 'Escolha um número entre 1 e 10');
+}
 
+exibirMensagemInicial();
 
+function verificarChute() {
+    let chute = document.querySelector('input').value;
+    
+    if (chute == numeroSecreto) {
+        exibirTextoNaTela('h1', 'Acertou!');
+        let palavraTentativa = tentativas > 1 ? 'tentativas' : 'tentativa';
+        let mensagemTentativas = `Você descobriu o número secreto com ${tentativas} ${palavraTentativa}!`;
+        exibirTextoNaTela('p', mensagemTentativas);
+        document.getElementById('reiniciar').removeAttribute('disabled');
+    } else {
+        if (chute > numeroSecreto) {
+            exibirTextoNaTela('p', 'O número secreto é menor');
+        } else {
+            exibirTextoNaTela('p', 'O número secreto é maior');
+        }
+        tentativas++;
+        limparCampo();
+    }
+}
 
-// Usar crase quando for por variável !!
-// a variavel vai dentro de ${}
+function gerarNumeroAleatorio() {
+    let numeroEscolhido = parseInt(Math.random() * numeroLimite + 1);
+    let quantidadeDeElementosNaLista = listaDeNumerosSorteados.length;
+
+    if (quantidadeDeElementosNaLista == numeroLimite) {
+        listaDeNumerosSorteados = [];
+    }
+    if (listaDeNumerosSorteados.includes(numeroEscolhido)) {
+        return gerarNumeroAleatorio();
+    } else {
+        listaDeNumerosSorteados.push(numeroEscolhido);
+        console.log(listaDeNumerosSorteados)
+        return numeroEscolhido;
+    }
+}
+
+function limparCampo() {
+    chute = document.querySelector('input');
+    chute.value = '';
+}
+
+function reiniciarJogo() {
+    numeroSecreto = gerarNumeroAleatorio();
+    limparCampo();
+    tentativas = 1;
+    exibirMensagemInicial();
+    document.getElementById('reiniciar').setAttribute('disabled', true)
+}
